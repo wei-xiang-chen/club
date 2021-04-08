@@ -1,0 +1,12 @@
+Database:
+    DBtype: postgres
+    Username: postgres
+    Password: 124411082
+    Host: 127.0.0.1
+    Part: 5432
+    DBName: club
+    TablePrefix: club_
+    Charset: utf8
+    ParseTime: True
+    MaxIdleConns: 10
+    MaxOpenConns: 30
