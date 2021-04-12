@@ -2,6 +2,8 @@ package main
 
 import (
 	"club/client"
+	"club/handler"
+	"club/middleware/club"
 	"club/middleware/login"
 	"club/setting"
 	"log"
@@ -38,6 +40,14 @@ func initializeRoutes() *gin.Engine {
 		loginRouter := v1Router.Group("/login/")
 		{
 			loginRouter.POST("/", login.Login)
+		}
+
+		clubRouter := v1Router.Group("/club/").Use(handler.UidAuth())
+		{
+			clubRouter.GET("/", club.GetList)
+			clubRouter.POST("/", club.Create)
+			clubRouter.POST("/join/:clubId", club.Join)
+			clubRouter.POST("/leave/", club.Leave)
 		}
 	}
 

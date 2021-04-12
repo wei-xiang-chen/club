@@ -3,6 +3,7 @@ package login
 import (
 	"club/pojo"
 	"club/pojo/rest"
+	"club/service/user_service"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -10,13 +11,22 @@ import (
 
 var (
 	restResult rest.RestResult
+	restError  rest.RestError
 )
 
 func Login(c *gin.Context) {
-	var login pojo.Login
+	var login pojo.User
 
 	c.ShouldBindJSON(&login)
 
-	restResult.Data = loginService.Insert(&login)
+	user, err := user_service.Insert(&login)
+	if err != nil {
+		restError.Description = err.Error()
+		restResult.Error = &restError
+		c.JSON(http.StatusInternalServerError, restResult)
+		return
+	}
+
+	restResult.Data = user
 	c.JSON(http.StatusOK, restResult)
 }
