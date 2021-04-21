@@ -17,7 +17,7 @@ steps:
   settings: 
     username: xiang
     password: "!QAZ1qaz1qaz"
-    repo: 104.214.48.227:5000/home/xiang/backend
+    repo: 104.214.48.227:5000/wei-xiang-chen/club
     target: production
     insecure: true
     auto_tag: true
