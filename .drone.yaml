@@ -7,21 +7,25 @@ steps:
   image: golang:1.12
   commands:
   - go build
-  trigger:
-    ref:
-    - refs/tags/latest
-    - refs/tags/v*
+  when:
+    # ref:
+    # - refs/tags/latest
+    # - refs/tags/v*
+    branch:
+      - developer
 
 - name: build-images-push-nexus
   image: plugins/docker
   settings: 
     username: xiang
     password: "!QAZ1qaz1qaz"
-    repo: 104.214.48.227:5000/home/xiang/club/backend
+    repo: 104.214.48.227:5000/home/xiang/backend
     target: production
     insecure: true
     auto_tag: true
-  trigger:
-    ref:
-    - refs/tags/latest
-    - refs/tags/v*
+  when:
+    # ref:
+    # - refs/tags/latest
+    # - refs/tags/v*
+    branch:
+      - developer
