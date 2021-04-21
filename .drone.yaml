@@ -1,0 +1,27 @@
+kind: pipeline
+type: docker
+name: build
+
+steps:
+- name: build
+  image: golang:1.12
+  commands:
+  - go build
+  when:
+    ref:
+    - refs/tags/latest
+    - refs/tags/v*
+
+- name: build-images-push-nexus
+  image: plugins/docker
+  settings: 
+    username: xiang
+    password: "!QAZ1qaz1qaz"
+    repo: 104.214.48.227:5000/home/xiang/club/backend
+    target: production
+    insecure: true
+    auto_tag: true
+  when:
+    ref:
+    - refs/tags/latest
+    - refs/tags/v*
