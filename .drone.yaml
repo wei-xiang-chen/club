@@ -8,11 +8,9 @@ steps:
   commands:
   - go build
   when:
-    # ref:
-    # - refs/tags/latest
-    # - refs/tags/v*
-    branch:
-      - developer
+    ref:
+    - refs/tags/latest
+    - refs/tags/v*
 
 - name: build-images-push-nexus
   image: plugins/docker
@@ -24,8 +22,6 @@ steps:
     insecure: true
     auto_tag: true
   when:
-    # ref:
-    # - refs/tags/latest
-    # - refs/tags/v*
-    branch:
-      - developer
+    ref:
+    - refs/tags/latest
+    - refs/tags/v*
