@@ -7,7 +7,7 @@ steps:
   image: golang:1.12
   commands:
   - go build
-  when:
+  trigger:
     ref:
     - refs/tags/latest
     - refs/tags/v*
@@ -21,7 +21,7 @@ steps:
     target: production
     insecure: true
     auto_tag: true
-  when:
+  trigger:
     ref:
     - refs/tags/latest
     - refs/tags/v*
