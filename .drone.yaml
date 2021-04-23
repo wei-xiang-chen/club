@@ -15,10 +15,12 @@ steps:
 - name: build-images-push-nexus
   image: plugins/docker
   settings: 
-    username: xiang
-    password: "!QAZ1qaz1qaz"
+    username: 
+      from_secret: docker_username
+    password: 
+      from_secret: docker_password
     repo: 104.214.48.227:5000/wei-xiang-chen/club
-    target: production
+    registry: 104.214.48.227:5000
     insecure: true
     auto_tag: true
   when:
