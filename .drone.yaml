@@ -19,7 +19,7 @@ steps:
       from_secret: docker_username
     password: 
       from_secret: docker_password
-    repo: 104.214.48.227:5000/wei-xiang-chen/club
+    repo: 104.214.48.227:5000/frontend
     registry: 104.214.48.227:5000
     insecure: true
     auto_tag: true
@@ -27,3 +27,17 @@ steps:
     ref:
     - refs/tags/latest
     - refs/tags/v*
+
+# - name: deploy
+#   image: 104.214.48.227:5000/wei-xiang-chen/club
+#   pull: if-not-exists
+#   settings:
+#     namespace: erp-backend-uat
+#     deployment: svc-eft-customer-api
+#     repo: 104.214.48.227:5000/wei-xiang-chen/club
+#     container: club
+#     tag: ${DRONE_SEMVER}
+#   when:
+#     ref:
+#     - refs/tags/latest
+#     - refs/tags/v*
