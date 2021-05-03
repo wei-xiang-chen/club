@@ -7,10 +7,9 @@ import (
 	"club/handler"
 	"club/setting"
 	"log"
-	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/rs/cors"
+	cors "github.com/rs/cors/wrapper/gin"
 )
 
 func init() {
@@ -29,22 +28,22 @@ func init() {
 
 func main() {
 
-	handler := initializeRoutes()
-	http.ListenAndServe(":8080", handler)
+	router := initializeRoutes()
+	router.Run(":8080")
 }
 
-func initializeRoutes() http.Handler {
+func initializeRoutes() *gin.Engine {
 	router := gin.Default()
 	router.Static("/api-docs", "./swagger/dist")
 
 	v1Router := router.Group("/api/v1/")
 	{
-		loginRouter := v1Router.Group("/login/")
+		loginRouter := v1Router.Group("/login/").Use(cors.Default())
 		{
 			loginRouter.POST("/", login.Login)
 		}
 
-		clubRouter := v1Router.Group("/club/").Use(handler.UidAuth())
+		clubRouter := v1Router.Group("/club/").Use(cors.Default()).Use(handler.UidAuth())
 		{
 			clubRouter.GET("/", club.GetList)
 			clubRouter.POST("/", club.Create)
@@ -53,7 +52,7 @@ func initializeRoutes() http.Handler {
 		}
 	}
 
-	return cors.Default().Handler(router)
+	return router
 }
 
 func setupSetting() error {
