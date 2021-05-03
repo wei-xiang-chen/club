@@ -38,12 +38,12 @@ func initializeRoutes() *gin.Engine {
 
 	v1Router := router.Group("/api/v1/")
 	{
-		loginRouter := v1Router.Group("/login/").Use(cors.Default())
+		loginRouter := v1Router.Group("/login/").Use(cors.AllowAll())
 		{
 			loginRouter.POST("/", login.Login)
 		}
 
-		clubRouter := v1Router.Group("/club/").Use(cors.Default()).Use(handler.UidAuth())
+		clubRouter := v1Router.Group("/club/").Use(cors.AllowAll()).Use(handler.UidAuth())
 		{
 			clubRouter.GET("/", club.GetList)
 			clubRouter.POST("/", club.Create)
