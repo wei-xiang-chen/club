@@ -1,0 +1,50 @@
+version: '2'
+
+services:
+
+  drone-server:
+    image: drone/drone:1
+    container_name: drone-server
+    ports:
+      - 80:80
+      - 443:443
+      
+    volumes:
+      - /var/lib/drone:/data
+      - /var/run/docker.sock:/var/run/docker.sock
+    restart: always
+    environment:
+      - DRONE_SERVER_HOST=xiang.southcentralus.cloudapp.azure.com
+      - DRONE_SERVER_PROTO=http
+      - DRONE_RPC_SECRET=124411082
+
+      # GitHub Config
+      - DRONE_GITHUB_SERVER=https://github.com
+      - DRONE_GITHUB_CLIENT_ID=4aa9259ec8fbf091963a
+      - DRONE_GITHUB_CLIENT_SECRET=ee1d779d90cc746ee37ab8fe5929d22a4f3d7d5d
+
+      - DRONE_LOGS_PRETTY=true
+      - DRONE_LOGS_COLOR=true
+      - DRONE_AGENTS_ENABLED=true
+      - DRONE_TLS_AUTOCERT=true
+      - DRONE_USER_FILTER=lnikell
+      - DRONE_USER_CREATE=username:wei-xiang-chen,admin:true
+      - DRONE_SERVER_NAME=drone
+
+  # runner for docker version
+  drone-runner:
+    image: drone/drone-runner-docker:1
+    container_name: drone-runner
+    restart: always
+    ports:
+      - 3000:3000
+    depends_on:
+      - drone-server
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    environment:
+      - DRONE_RPC_HOST=drone-server
+      - DRONE_RPC_PROTO=http
+      - DRONE_RPC_SECRET=124411082
+      - DRONE_RUNNER_CAPACITY=3
+      - DRONE_RUNNER_NAME=drone-runner

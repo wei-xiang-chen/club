@@ -2,13 +2,15 @@ package main
 
 import (
 	"club/client"
+	"club/controller/club"
+	"club/controller/login"
 	"club/handler"
-	"club/middleware/club"
-	"club/middleware/login"
 	"club/setting"
 	"log"
+	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/rs/cors"
 )
 
 func init() {
@@ -27,11 +29,11 @@ func init() {
 
 func main() {
 
-	router := initializeRoutes()
-	router.Run(":8080")
+	handler := initializeRoutes()
+	http.ListenAndServe(":8080", handler)
 }
 
-func initializeRoutes() *gin.Engine {
+func initializeRoutes() http.Handler {
 	router := gin.Default()
 	router.Static("/api-docs", "./swagger/dist")
 
@@ -51,7 +53,7 @@ func initializeRoutes() *gin.Engine {
 		}
 	}
 
-	return router
+	return cors.Default().Handler(router)
 }
 
 func setupSetting() error {
