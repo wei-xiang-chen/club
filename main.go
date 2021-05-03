@@ -33,17 +33,23 @@ func main() {
 }
 
 func initializeRoutes() *gin.Engine {
+	option := cors.Options{
+		AllowedOrigins: []string{"*"},
+		AllowedMethods: []string{"GET", "POST", "OPTIONS", "DELETE"},
+		AllowedHeaders: []string{"X-Request-UID", "Content-Type"},
+	}
+
 	router := gin.Default()
 	router.Static("/api-docs", "./swagger/dist")
 
 	v1Router := router.Group("/api/v1/")
 	{
-		loginRouter := v1Router.Group("/login/").Use(cors.AllowAll())
+		loginRouter := v1Router.Group("/login/").Use(cors.New(option))
 		{
 			loginRouter.POST("/", login.Login)
 		}
 
-		clubRouter := v1Router.Group("/club/").Use(cors.AllowAll()).Use(handler.UidAuth())
+		clubRouter := v1Router.Group("/club/").Use(cors.New(option)).Use(handler.UidAuth())
 		{
 			clubRouter.GET("/", club.GetList)
 			clubRouter.POST("/", club.Create)
