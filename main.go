@@ -48,7 +48,7 @@ func initializeRoutes() *gin.Engine {
 
 	v1Router := router.Group("/api/v1/")
 	{
-		loginRouter := v1Router.Group("/login/").Use(cors.New(option))
+		loginRouter := v1Router.Group("/login/").Use(cors.Default())
 		{
 			loginRouter.POST("/", login.Login)
 		}
