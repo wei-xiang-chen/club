@@ -7,7 +7,6 @@ import (
 	"club/handler"
 	"club/setting"
 	"log"
-	"time"
 
 	"github.com/gin-gonic/gin"
 	cors "github.com/rs/cors/wrapper/gin"
@@ -34,14 +33,14 @@ func main() {
 }
 
 func initializeRoutes() *gin.Engine {
-	option := cors.Options{
-		AllowedOrigins:   []string{"*"},
-		AllowedMethods:   []string{"GET", "POST", "PUT", "PATCH", "DELETE", "HEAD"},
-		AllowedHeaders:   []string{"*"},
-		AllowCredentials: false,
-		MaxAge:           int(12 * time.Hour),
-		Debug:            true,
-	}
+	// option := cors.Options{
+	// 	AllowedOrigins:   []string{"*"},
+	// 	AllowedMethods:   []string{"GET", "POST", "PUT", "PATCH", "DELETE", "HEAD"},
+	// 	AllowedHeaders:   []string{"*"},
+	// 	AllowCredentials: false,
+	// 	MaxAge:           int(12 * time.Hour),
+	// 	Debug:            true,
+	// }
 
 	router := gin.Default()
 	router.Static("/api-docs", "./swagger/dist")
