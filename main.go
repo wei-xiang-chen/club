@@ -44,7 +44,7 @@ func initializeRoutes() http.Handler {
 			loginRouter.POST("/", login.Login)
 		}
 
-		clubRouter := v1Router.Group("/club/").Use(handler.UidAuth())
+		clubRouter := v1Router.Group("/club/").Use(handler.CORSMiddleware()).Use(handler.UidAuth())
 		{
 			clubRouter.GET("/", club.GetList)
 			clubRouter.POST("/", club.Create)
