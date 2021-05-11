@@ -4,12 +4,13 @@ import (
 	"club/client"
 	"club/controller/club"
 	"club/controller/login"
-	"club/handler"
+	"club/middleware"
 	"club/setting"
 	"log"
+	"net/http"
 
 	"github.com/gin-gonic/gin"
-	cors "github.com/rs/cors/wrapper/gin"
+	"github.com/rs/cors"
 )
 
 func init() {
@@ -29,30 +30,22 @@ func init() {
 func main() {
 
 	router := initializeRoutes()
-	router.Run(":8080")
+	http.ListenAndServe(":8080", router)
 }
 
-func initializeRoutes() *gin.Engine {
-	// option := cors.Options{
-	// 	AllowedOrigins:   []string{"*"},
-	// 	AllowedMethods:   []string{"GET", "POST", "PUT", "PATCH", "DELETE", "HEAD"},
-	// 	AllowedHeaders:   []string{"*"},
-	// 	AllowCredentials: false,
-	// 	MaxAge:           int(12 * time.Hour),
-	// 	Debug:            true,
-	// }
+func initializeRoutes() http.Handler {
 
 	router := gin.Default()
 	router.Static("/api-docs", "./swagger/dist")
 
 	v1Router := router.Group("/api/v1/")
 	{
-		loginRouter := v1Router.Group("/login/").Use(cors.Default())
+		loginRouter := v1Router.Group("/login/")
 		{
 			loginRouter.POST("/", login.Login)
 		}
 
-		clubRouter := v1Router.Group("/club/").Use(cors.Default()).Use(handler.UidAuth())
+		clubRouter := v1Router.Group("/club/").Use(middleware.UidAuth())
 		{
 			clubRouter.GET("/", club.GetList)
 			clubRouter.POST("/", club.Create)
@@ -61,7 +54,7 @@ func initializeRoutes() *gin.Engine {
 		}
 	}
 
-	return router
+	return cors.AllowAll().Handler(router)
 }
 
 func setupSetting() error {
