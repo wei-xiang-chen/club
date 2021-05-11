@@ -54,7 +54,7 @@ func initializeRoutes() http.Handler {
 		}
 	}
 
-	return cors.Default().Handler(router)
+	return cors.AllowAll().Handler(router)
 }
 
 func setupSetting() error {
