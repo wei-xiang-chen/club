@@ -8,11 +8,11 @@ import (
 )
 
 type Club struct {
-	Id         int    `gorm:"primaryKey"`
-	ClubName   string `gorm:"column:club_name"`
-	Topic      string ``
-	Owner      int    ``
-	population int    ``
+	Id         int     `gorm:"primaryKey" json:"id"`
+	ClubName   *string `gorm:"column:club_name" json:"clubName"`
+	Topic      *string `json:"topic"`
+	Owner      *User   `gorm:"embedded" json:"owner"`
+	Population *int    `json:"population"`
 }
 
 func (c *Club) TableName() string {
@@ -32,7 +32,7 @@ func (c *Club) Insert(club *pojo.Club) error {
 func (c *Club) GetList(topic string, clubName string, offset int, limit int) ([]*Club, error) {
 	var clubs []*Club
 
-	tx := client.DBEngine.Table(c.TableName())
+	tx := client.DBEngine.Debug().Table(c.TableName()).Select("club_clubs.id, club_clubs.club_name, club_clubs.topic, club_clubs.population, club_user.id, club_user.nickname").Joins("LEFT JOIN club_user ON club_clubs.owner = club_user.id")
 
 	if topic != "" {
 		tx = tx.Where("topic = ?", topic)
