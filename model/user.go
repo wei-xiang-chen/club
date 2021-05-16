@@ -3,6 +3,8 @@ package model
 import (
 	"club/client"
 	"club/pojo"
+
+	"github.com/jinzhu/gorm"
 )
 
 type User struct {
@@ -48,7 +50,12 @@ func (u *User) FindUserByUid(uid string) (*User, error) {
 	var user User
 
 	if err := client.DBEngine.Table(u.TableName()).Where("uid = ?", uid).Find(&user).Error; err != nil {
-		return nil, err
+		if err != nil {
+			if err == gorm.ErrRecordNotFound {
+				return nil, nil
+			}
+			return nil, err
+		}
 	}
 	return &user, nil
 }

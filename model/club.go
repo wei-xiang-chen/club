@@ -3,8 +3,10 @@ package model
 import (
 	"club/client"
 	"club/pojo"
+	appError "club/pojo/error"
 
 	"github.com/jinzhu/gorm"
+	"github.com/lib/pq"
 )
 
 type Club struct {
@@ -22,6 +24,13 @@ func (c *Club) TableName() string {
 func (c *Club) Insert(club *pojo.Club) error {
 
 	err := client.DBEngine.Table(c.TableName()).Create(&club).Error
+
+	if err, ok := err.(*pq.Error); ok {
+		if err.Code == "23505" {
+			return appError.AppError{Message: "您已是房主，請離開房間後再次建立。"}
+		}
+	}
+
 	if err != nil {
 		return err
 	}
@@ -32,7 +41,7 @@ func (c *Club) Insert(club *pojo.Club) error {
 func (c *Club) GetList(topic string, clubName string, offset int, limit int) ([]*Club, error) {
 	var clubs []*Club
 
-	tx := client.DBEngine.Debug().Table(c.TableName()).Select("club_clubs.id, club_clubs.club_name, club_clubs.topic, club_clubs.population, club_user.id, club_user.nickname").Joins("LEFT JOIN club_user ON club_clubs.owner = club_user.id")
+	tx := client.DBEngine.Table(c.TableName()).Select("club_clubs.id, club_clubs.club_name, club_clubs.topic, club_clubs.population, club_user.id, club_user.nickname").Joins("LEFT JOIN club_user ON club_clubs.owner = club_user.id")
 
 	if topic != "" {
 		tx = tx.Where("topic = ?", topic)

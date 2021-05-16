@@ -42,15 +42,15 @@ func initializeRoutes() http.Handler {
 	{
 		loginRouter := v1Router.Group("/login/")
 		{
-			loginRouter.POST("/", login.Login)
+			loginRouter.POST("/", middleware.ErrorHandler(login.Login))
 		}
 
 		clubRouter := v1Router.Group("/club/").Use(middleware.UidAuth())
 		{
-			clubRouter.GET("/", club.GetList)
-			clubRouter.POST("/", club.Create)
-			clubRouter.POST("/join/:clubId", club.Join)
-			clubRouter.POST("/leave/", club.Leave)
+			clubRouter.GET("/", middleware.ErrorHandler(club.GetList))
+			clubRouter.POST("/", middleware.ErrorHandler(club.Create))
+			clubRouter.POST("/join/:clubId", middleware.ErrorHandler(club.Join))
+			clubRouter.POST("/leave/", middleware.ErrorHandler(club.Leave))
 		}
 	}
 

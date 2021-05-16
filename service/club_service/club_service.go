@@ -3,7 +3,6 @@ package club_service
 import (
 	"club/model"
 	"club/pojo"
-	"fmt"
 )
 
 var (
@@ -25,7 +24,7 @@ func Insert(club *pojo.Club) error {
 
 	err := clubModel.Insert(club)
 	if err != nil {
-		fmt.Println(err)
+		return err
 	}
 
 	err = userModel.SetClubId(club.Owner, &club.Id)

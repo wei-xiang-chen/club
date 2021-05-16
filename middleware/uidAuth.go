@@ -9,13 +9,11 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-var (
-	restResult rest.RestResult
-	restError  rest.RestError
-)
-
 func UidAuth() gin.HandlerFunc {
 	return func(c *gin.Context) {
+		var restResult rest.RestResult
+		var restError rest.RestError
+
 		if uid := c.Request.Header.Get("X-Request-UID"); uid != "" {
 			var user *model.User
 
@@ -24,12 +22,16 @@ func UidAuth() gin.HandlerFunc {
 				restError.Description = err.Error()
 				restResult.Error = &restError
 				c.JSON(http.StatusInternalServerError, restResult)
+				c.Abort()
+				return
 			}
 
 			if user == nil {
 				restError.Message = "無效 X-Request-UID"
 				restResult.Error = &restError
 				c.JSON(http.StatusUnauthorized, restResult)
+				c.Abort()
+				return
 			}
 
 			c.Request.Header.Set("ID", strconv.Itoa(user.Id))
@@ -39,6 +41,7 @@ func UidAuth() gin.HandlerFunc {
 			restResult.Error = &restError
 
 			c.JSON(http.StatusUnauthorized, restResult)
+			c.Abort()
 			return
 		}
 	}
