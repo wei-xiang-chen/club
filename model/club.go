@@ -77,7 +77,7 @@ func (c *Club) FindByOwner(owner int) (*Club, error) {
 
 func (c *Club) Delete(id int) error {
 
-	err := client.DBEngine.Table(c.TableName()).Delete(id).Error
+	err := client.DBEngine.Table(c.TableName()).Delete(&Club{}, id).Error
 	if err != nil {
 		return err
 	}

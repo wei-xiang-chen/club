@@ -53,12 +53,12 @@ func Leave(userId int) error {
 	}
 
 	if club != nil {
-		err = userModel.ClearClub(club.Id)
+		err = club.Delete(club.Id)
 		if err != nil {
 			return err
 		}
 
-		err = club.Delete(club.Id)
+		err = userModel.ClearClub(club.Id)
 		if err != nil {
 			return err
 		}
