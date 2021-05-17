@@ -3,6 +3,7 @@ package main
 import (
 	"club/client"
 	"club/controller/club"
+	"club/controller/code"
 	"club/controller/login"
 	"club/middleware"
 	"club/setting"
@@ -51,6 +52,11 @@ func initializeRoutes() http.Handler {
 			clubRouter.POST("/", middleware.ErrorHandler(club.Create))
 			clubRouter.POST("/join/:clubId", middleware.ErrorHandler(club.Join))
 			clubRouter.POST("/leave/", middleware.ErrorHandler(club.Leave))
+		}
+
+		codeRouter := v1Router.Group("/code/").Use(middleware.UidAuth())
+		{
+			codeRouter.GET("/", middleware.ErrorHandler(code.Code))
 		}
 	}
 
