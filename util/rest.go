@@ -1,4 +1,4 @@
-package rest_util
+package util
 
 import (
 	"club/pojo"
@@ -7,19 +7,17 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-var (
-	user pojo.User
-)
+func GetUser(c *gin.Context) (*pojo.User, error) {
+	var user pojo.User
 
-func GetUser(c *gin.Context) (pojo.User, error) {
 	user.Uid = c.Request.Header.Get("X-Request-UID")
 	i, err := strconv.Atoi(c.Request.Header.Get("ID"))
 
 	if err != nil {
-		return user, err
+		return nil, err
 	}
 
 	user.Id = i
 
-	return user, nil
+	return &user, nil
 }

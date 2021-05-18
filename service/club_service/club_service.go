@@ -10,7 +10,7 @@ var (
 	userModel model.User
 )
 
-func GetList(topic string, clubName string, offset int, limit int) ([]*model.Club, error) {
+func GetList(topic *string, clubName *string, offset *int, limit *int) ([]*model.Club, error) {
 
 	clubs, err := clubModel.GetList(topic, clubName, offset, limit)
 	if err != nil {
@@ -27,7 +27,7 @@ func Insert(club *pojo.Club) error {
 		return err
 	}
 
-	err = userModel.SetClubId(club.Owner, &club.Id)
+	err = userModel.SetClubId(club.Owner, club.Id)
 	if err != nil {
 		return err
 	}
@@ -35,9 +35,9 @@ func Insert(club *pojo.Club) error {
 	return nil
 }
 
-func Join(userId int, clubId int) error {
+func Join(userId *int, clubId *int) error {
 
-	err := userModel.SetClubId(userId, &clubId)
+	err := userModel.SetClubId(userId, clubId)
 	if err != nil {
 		return err
 	}
@@ -45,7 +45,7 @@ func Join(userId int, clubId int) error {
 	return nil
 }
 
-func Leave(userId int) error {
+func Leave(userId *int) error {
 
 	club, err := clubModel.FindByOwner(userId)
 	if err != nil {
@@ -53,12 +53,12 @@ func Leave(userId int) error {
 	}
 
 	if club != nil {
-		err = club.Delete(club.Id)
+		err = club.Delete(&club.Id)
 		if err != nil {
 			return err
 		}
 
-		err = userModel.ClearClub(club.Id)
+		err = userModel.ClearClub(&club.Id)
 		if err != nil {
 			return err
 		}

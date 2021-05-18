@@ -2,6 +2,8 @@ package code_service
 
 import (
 	"club/model"
+	appError "club/pojo/error"
+	"strings"
 )
 
 var (
@@ -36,4 +38,19 @@ func Code(types []string) (*map[string][]model.Code, error) {
 	}
 
 	return &newCodes, nil
+}
+
+func CheckCode(_type string, option *string) error {
+	*option = strings.ToUpper(*option)
+
+	count, err := codemodel.CheckCode(_type, *option)
+	if err != nil {
+		return err
+	}
+
+	if *count > 0 {
+		return nil
+	} else {
+		return appError.AppError{Message: "Code is illegal." + "[" + *option + "]"}
+	}
 }

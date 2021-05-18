@@ -28,8 +28,8 @@ func (u *User) Insert(user *pojo.User) error {
 	return nil
 }
 
-func (u *User) SetClubId(userId int, clubId *int) error {
-	err := client.DBEngine.Table(u.TableName()).Where("id = ?", userId).Update("club_id", clubId).Error
+func (u *User) SetClubId(userId *int, clubId *int) error {
+	err := client.DBEngine.Table(u.TableName()).Where("id = ?", *userId).Update("club_id", clubId).Error
 	if err != nil {
 		return err
 	}
@@ -37,8 +37,8 @@ func (u *User) SetClubId(userId int, clubId *int) error {
 	return nil
 }
 
-func (u *User) ClearClub(clubId int) error {
-	err := client.DBEngine.Table(u.TableName()).Where("club_id = ?", clubId).Update("club_id", nil).Error
+func (u *User) ClearClub(clubId *int) error {
+	err := client.DBEngine.Table(u.TableName()).Where("club_id = ?", *clubId).Update("club_id", nil).Error
 	if err != nil {
 		return err
 	}
@@ -46,10 +46,10 @@ func (u *User) ClearClub(clubId int) error {
 	return nil
 }
 
-func (u *User) FindUserByUid(uid string) (*User, error) {
+func (u *User) FindUserByUid(uid *string) (*User, error) {
 	var user User
 
-	if err := client.DBEngine.Table(u.TableName()).Where("uid = ?", uid).Find(&user).Error; err != nil {
+	if err := client.DBEngine.Table(u.TableName()).Where("uid = ?", *uid).Find(&user).Error; err != nil {
 		if err != nil {
 			if err == gorm.ErrRecordNotFound {
 				return nil, nil

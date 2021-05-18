@@ -17,7 +17,7 @@ func UidAuth() gin.HandlerFunc {
 		if uid := c.Request.Header.Get("X-Request-UID"); uid != "" {
 			var user *model.User
 
-			user, err := user.FindUserByUid(uid)
+			user, err := user.FindUserByUid(&uid)
 			if err != nil {
 				restError.Description = err.Error()
 				restResult.Error = &restError
