@@ -6,22 +6,22 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-var (
-	pageDefault  int = 1
-	limitDefault int = 10
+const (
+	PAGE_DEFAULT  int = 1
+	LIMIT_DEFAULT int = 10
 )
 
 func GetPagination(c *gin.Context) (*int, *int, error) {
-	var page, limit *int
+	var page, limit int
 
 	if value, ok := c.GetQuery("page"); ok {
 		p, err := strconv.Atoi(value)
 		if err != nil {
 			return nil, nil, err
 		}
-		page = &p
+		page = p
 	} else {
-		page = &pageDefault
+		page = PAGE_DEFAULT
 	}
 
 	if value, ok := c.GetQuery("limit"); ok {
@@ -29,12 +29,12 @@ func GetPagination(c *gin.Context) (*int, *int, error) {
 		if err != nil {
 			return nil, nil, err
 		}
-		limit = &l
+		limit = l
 	} else {
-		limit = &limitDefault
+		limit = LIMIT_DEFAULT
 	}
 
-	offset := (*page - 1) * *limit
+	offset := (page - 1) * limit
 
-	return &offset, limit, nil
+	return &offset, &limit, nil
 }

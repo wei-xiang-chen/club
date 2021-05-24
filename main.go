@@ -7,6 +7,7 @@ import (
 	"club/controller/login"
 	"club/middleware"
 	"club/setting"
+	"club/ws"
 	"log"
 	"net/http"
 
@@ -57,6 +58,11 @@ func initializeRoutes() http.Handler {
 		codeRouter := v1Router.Group("/code/").Use(middleware.UidAuth())
 		{
 			codeRouter.GET("/", middleware.ErrorHandler(code.Code))
+		}
+
+		wsRouter := v1Router.Group("/ws/")
+		{
+			wsRouter.GET("/:roomId", ws.ServeWs)
 		}
 	}
 
