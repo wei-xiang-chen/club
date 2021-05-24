@@ -5,7 +5,6 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
 )
 
@@ -44,7 +43,7 @@ type connection struct {
 func (s subscription) readPump() {
 	c := s.conn
 	defer func() {
-		h.unregister <- s
+		H.unregister <- s
 		c.ws.Close()
 	}()
 	c.ws.SetReadLimit(maxMessageSize)
@@ -59,7 +58,7 @@ func (s subscription) readPump() {
 			break
 		}
 		m := message{msg, s.room}
-		h.broadcast <- m
+		H.broadcast <- m
 	}
 }
 
@@ -96,10 +95,7 @@ func (s *subscription) writePump() {
 }
 
 // serveWs handles websocket requests from the peer.
-func ServeWs(c *gin.Context) {
-	roomId := c.Param("roomId")
-	w := c.Writer
-	r := c.Request
+func ServeWs(w http.ResponseWriter, r *http.Request, roomId string) {
 
 	ws, err := upgrader.Upgrade(w, r, nil)
 	if err != nil {
@@ -108,7 +104,7 @@ func ServeWs(c *gin.Context) {
 	}
 	con := &connection{send: make(chan []byte, 256), ws: ws}
 	s := subscription{con, roomId}
-	h.register <- s
+	H.register <- s
 	go s.writePump()
 	go s.readPump()
 }

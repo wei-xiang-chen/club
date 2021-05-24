@@ -30,6 +30,7 @@ func init() {
 }
 
 func main() {
+	go ws.H.Run()
 
 	router := initializeRoutes()
 	http.ListenAndServe(":8080", router)
@@ -62,7 +63,10 @@ func initializeRoutes() http.Handler {
 
 		wsRouter := v1Router.Group("/ws/")
 		{
-			wsRouter.GET("/:roomId", ws.ServeWs)
+			wsRouter.GET("/:roomId", func(c *gin.Context) {
+				roomId := c.Param("roomId")
+				ws.ServeWs(c.Writer, c.Request, roomId)
+			})
 		}
 	}
 
