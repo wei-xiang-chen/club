@@ -49,6 +49,7 @@ func (h *hub) Run() {
 				if _, ok := connections[s.conn]; ok {
 					delete(connections, s.conn)
 					close(s.conn.send)
+
 					if len(connections) == 0 {
 						delete(h.rooms, s.room)
 					}
@@ -68,5 +69,17 @@ func (h *hub) Run() {
 				}
 			}
 		}
+	}
+}
+
+func (h *hub) DeleteClub(clubId string) {
+	connections := h.rooms[clubId]
+	if connections != nil {
+		for k := range connections {
+			delete(connections, k)
+			close(k.send)
+		}
+
+		delete(h.rooms, clubId)
 	}
 }

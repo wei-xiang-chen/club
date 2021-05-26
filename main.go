@@ -63,10 +63,7 @@ func initializeRoutes() http.Handler {
 
 		wsRouter := v1Router.Group("/ws/")
 		{
-			wsRouter.GET("/:roomId", func(c *gin.Context) {
-				roomId := c.Param("roomId")
-				ws.ServeWs(c.Writer, c.Request, roomId)
-			})
+			wsRouter.GET("/:roomId", ws.ServeWs)
 		}
 	}
 

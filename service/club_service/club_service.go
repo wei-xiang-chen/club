@@ -3,6 +3,8 @@ package club_service
 import (
 	"club/model"
 	"club/pojo"
+	"club/ws"
+	"strconv"
 )
 
 var (
@@ -62,6 +64,8 @@ func Leave(userId *int) error {
 		if err != nil {
 			return err
 		}
+
+		ws.H.DeleteClub(strconv.Itoa(club.Id))
 	} else {
 		err = userModel.SetClubId(userId, nil)
 		if err != nil {

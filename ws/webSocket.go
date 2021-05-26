@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
 )
 
@@ -95,7 +96,10 @@ func (s *subscription) writePump() {
 }
 
 // serveWs handles websocket requests from the peer.
-func ServeWs(w http.ResponseWriter, r *http.Request, roomId string) {
+func ServeWs(c *gin.Context) {
+	roomId := c.Param("roomId")
+	w := c.Writer
+	r := c.Request
 
 	ws, err := upgrader.Upgrade(w, r, nil)
 	if err != nil {
