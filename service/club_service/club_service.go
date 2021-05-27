@@ -3,8 +3,7 @@ package club_service
 import (
 	"club/model"
 	"club/pojo"
-	"club/ws"
-	"strconv"
+	appError "club/pojo/error"
 )
 
 var (
@@ -39,9 +38,18 @@ func Insert(club *pojo.Club) error {
 
 func Join(userId *int, clubId *int) error {
 
-	err := userModel.SetClubId(userId, clubId)
+	clubExist, err := clubModel.CheckClubExist(clubId)
 	if err != nil {
 		return err
+	}
+
+	if clubExist {
+		err = userModel.SetClubId(userId, clubId)
+		if err != nil {
+			return err
+		}
+	} else {
+		return appError.AppError{Message: "The club does not exist."}
 	}
 
 	return nil
@@ -64,8 +72,6 @@ func Leave(userId *int) error {
 		if err != nil {
 			return err
 		}
-
-		ws.H.DeleteClub(strconv.Itoa(club.Id))
 	} else {
 		err = userModel.SetClubId(userId, nil)
 		if err != nil {

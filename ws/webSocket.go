@@ -1,8 +1,11 @@
 package ws
 
 import (
+	"club/model"
+	appError "club/pojo/error"
 	"log"
 	"net/http"
+	"strconv"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -96,19 +99,53 @@ func (s *subscription) writePump() {
 }
 
 // serveWs handles websocket requests from the peer.
-func ServeWs(c *gin.Context) {
-	roomId := c.Param("roomId")
+func ServeWs(c *gin.Context) error {
+	var userId int
+	var userModel model.User
+
+	roomIdStr := c.Param("roomId")
 	w := c.Writer
 	r := c.Request
+	roomId, err := strconv.Atoi(roomIdStr)
+
+	if value, ok := c.GetQuery("userId"); ok {
+		p, err := strconv.Atoi(value)
+		if err != nil {
+			return err
+		}
+
+		userId = p
+	} else {
+		userId = 0
+		return appError.AppError{Message: "userId is required"}
+	}
+
+	theSame, err := userModel.CompareUserAndClub(&userId, &roomId)
+	if err != nil {
+		return err
+	}
+	if !theSame {
+		return appError.AppError{Message: "The user is not in the room."}
+	}
+
+	connections := H.rooms[roomId]
+	if connections != nil {
+		for _, v := range connections {
+			if v == userId {
+				return appError.AppError{Message: "Repeat connection."}
+			}
+		}
+	}
 
 	ws, err := upgrader.Upgrade(w, r, nil)
 	if err != nil {
-		log.Println(err.Error())
-		return
+		return err
 	}
 	con := &connection{send: make(chan []byte, 256), ws: ws}
-	s := subscription{con, roomId}
+	s := subscription{con, roomId, userId}
 	H.register <- s
 	go s.writePump()
 	go s.readPump()
+
+	return nil
 }

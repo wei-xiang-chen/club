@@ -63,7 +63,7 @@ func initializeRoutes() http.Handler {
 
 		wsRouter := v1Router.Group("/ws/")
 		{
-			wsRouter.GET("/:roomId", ws.ServeWs)
+			wsRouter.GET("/:roomId", middleware.ErrorHandler(ws.ServeWs))
 		}
 	}
 

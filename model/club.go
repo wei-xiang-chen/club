@@ -74,6 +74,38 @@ func (c *Club) FindByOwner(owner *int) (*Club, error) {
 	return &club, nil
 }
 
+func (c *Club) CheckOwnerByUserId(userId *int) (bool, error) {
+	var count int
+
+	if err := client.DBEngine.Table(c.TableName()).Where("owner = ?", *userId).Count(&count).Error; err != nil {
+		if err != nil {
+			return false, err
+		}
+	}
+
+	if count > 0 {
+		return true, nil
+	} else {
+		return false, nil
+	}
+}
+
+func (c *Club) CheckClubExist(id *int) (bool, error) {
+	var count int
+
+	if err := client.DBEngine.Table(c.TableName()).Where("id = ?", *id).Count(&count).Error; err != nil {
+		if err != nil {
+			return false, err
+		}
+	}
+
+	if count > 0 {
+		return true, nil
+	} else {
+		return false, nil
+	}
+}
+
 func (c *Club) Delete(id *int) error {
 
 	err := client.DBEngine.Table(c.TableName()).Delete(&Club{}, *id).Error

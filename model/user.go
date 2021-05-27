@@ -59,3 +59,19 @@ func (u *User) FindUserByUid(uid *string) (*User, error) {
 	}
 	return &user, nil
 }
+
+func (u *User) CompareUserAndClub(id *int, clubId *int) (bool, error) {
+	var count int
+
+	if err := client.DBEngine.Table(u.TableName()).Where("id = ? AND club_id = ?", *id, *clubId).Count(&count).Error; err != nil {
+		if err != nil {
+			return false, err
+		}
+	}
+
+	if count > 0 {
+		return true, nil
+	} else {
+		return false, nil
+	}
+}
