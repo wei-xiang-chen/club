@@ -11,9 +11,9 @@ var (
 	userModel model.User
 )
 
-func GetList(topic *string, clubName *string, offset *int, limit *int) ([]*model.Club, error) {
+func GetList(clubId *int, topic *string, clubName *string, offset *int, limit *int) ([]*model.Club, error) {
 
-	clubs, err := clubModel.GetList(topic, clubName, offset, limit)
+	clubs, err := clubModel.GetList(clubId, topic, clubName, offset, limit)
 	if err != nil {
 		return nil, err
 	}

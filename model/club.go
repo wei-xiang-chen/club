@@ -37,16 +37,19 @@ func (c *Club) Insert(club *pojo.Club) error {
 	return nil
 }
 
-func (c *Club) GetList(topic *string, clubName *string, offset *int, limit *int) ([]*Club, error) {
+func (c *Club) GetList(clubId *int, topic *string, clubName *string, offset *int, limit *int) ([]*Club, error) {
 	var clubs []*Club
 
 	tx := client.DBEngine.Table(c.TableName()).Select("club_clubs.id, club_clubs.club_name, club_clubs.topic, club_clubs.population, club_user.id, club_user.nickname").Joins("LEFT JOIN club_user ON club_clubs.owner = club_user.id")
 
+	if clubId != nil {
+		tx = tx.Where("club_clubs.id = ?", *clubId)
+	}
 	if topic != nil {
 		tx = tx.Where("topic = ?", *topic)
 	}
 	if clubName != nil {
-		tx = tx.Where("club_name = ?", *clubName)
+		tx = tx.Where("club_name LIKE ?", "%"+*clubName+"%")
 	}
 
 	err := tx.Offset(*offset).Limit(*limit).Find(&clubs).Error

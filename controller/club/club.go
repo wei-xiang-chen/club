@@ -15,9 +15,16 @@ import (
 
 func GetList(c *gin.Context) error {
 	var topic, clubName *string
-	var offset, limit *int
+	var clubId, offset, limit *int
 	var restResult rest.RestResult
 
+	if value, ok := c.GetQuery("clubId"); ok {
+		c, err := strconv.Atoi(value)
+		if err != nil {
+			return err
+		}
+		clubId = &c
+	}
 	if value, ok := c.GetQuery("topic"); ok {
 		topic = &value
 	}
@@ -29,7 +36,7 @@ func GetList(c *gin.Context) error {
 		return err
 	}
 
-	clubs, err := club_service.GetList(topic, clubName, offset, limit)
+	clubs, err := club_service.GetList(clubId, topic, clubName, offset, limit)
 	if err != nil {
 		return err
 	}
