@@ -46,6 +46,20 @@ func (u *User) ClearClub(clubId *int) error {
 	return nil
 }
 
+func (u *User) GetUserClubById(userId *int) (*int, error) {
+	var clubId []*int
+
+	if err := client.DBEngine.Table(u.TableName()).Where("id = ?", *userId).Pluck("club_id", &clubId).Error; err != nil {
+		if err != nil {
+			if err == gorm.ErrRecordNotFound {
+				return nil, nil
+			}
+			return nil, err
+		}
+	}
+	return clubId[0], nil
+}
+
 func (u *User) FindUserByUid(uid *string) (*User, error) {
 	var user User
 

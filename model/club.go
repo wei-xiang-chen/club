@@ -111,8 +111,18 @@ func (c *Club) CheckClubExist(id *int) (bool, error) {
 
 func (c *Club) Delete(id *int) error {
 
-	err := client.DBEngine.Table(c.TableName()).Delete(&Club{}, *id).Error
-	if err != nil {
+	if err := client.DBEngine.Table(c.TableName()).Delete(&Club{}, *id).Error; err != nil {
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+func (c *Club) UpdatePopulation(id *int, population *int) error {
+
+	if err := client.DBEngine.Table(c.TableName()).Where("id = ?", *id).Update("population", population).Error; err != nil {
 		return err
 	}
 

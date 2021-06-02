@@ -42,14 +42,21 @@ func Join(userId *int, clubId *int) error {
 	if err != nil {
 		return err
 	}
-
-	if clubExist {
-		err = userModel.SetClubId(userId, clubId)
-		if err != nil {
-			return err
-		}
-	} else {
+	if !clubExist {
 		return appError.AppError{Message: "The club does not exist."}
+	}
+
+	originalClubId, err := userModel.GetUserClubById(userId)
+	if err != nil {
+		return err
+	}
+	if originalClubId != nil {
+		return appError.AppError{Message: "The user already in the room. Please leave the room first."}
+	}
+
+	err = userModel.SetClubId(userId, clubId)
+	if err != nil {
+		return err
 	}
 
 	return nil

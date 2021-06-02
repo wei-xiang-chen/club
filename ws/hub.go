@@ -53,6 +53,9 @@ func (h *hub) Run() {
 			}
 
 			h.rooms[s.room][s.conn] = s.userId
+
+			papulation := len(h.rooms[s.room])
+			clubModel.UpdatePopulation(&s.room, &papulation)
 		case s := <-h.unregister:
 			connections := h.rooms[s.room]
 			if connections != nil {
@@ -81,6 +84,8 @@ func (h *hub) Run() {
 						if len(connections) == 0 {
 							delete(h.rooms, s.room)
 						}
+						papulation := len(h.rooms[s.room])
+						clubModel.UpdatePopulation(&s.room, &papulation)
 					}
 				}
 			}
