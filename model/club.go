@@ -109,7 +109,7 @@ func (c *Club) CheckClubExist(id *int) (bool, error) {
 	}
 }
 
-func (c *Club) Delete(id *int) error {
+func (c *Club) DeleteClubById(id *int) error {
 
 	if err := client.DBEngine.Table(c.TableName()).Delete(&Club{}, *id).Error; err != nil {
 		if err != nil {

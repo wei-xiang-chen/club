@@ -70,7 +70,7 @@ func Leave(userId *int) error {
 	}
 
 	if club != nil {
-		err = club.Delete(&club.Id)
+		err = club.DeleteClubById(&club.Id)
 		if err != nil {
 			return err
 		}

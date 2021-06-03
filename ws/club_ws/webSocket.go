@@ -1,4 +1,4 @@
-package ws
+package club_ws
 
 import (
 	"club/model"
@@ -61,8 +61,7 @@ func (s subscription) readPump() {
 			}
 			break
 		}
-		//測完要拿掉
-		log.Printf("message: %v", msg)
+
 		m := message{msg, s.room}
 		H.broadcast <- m
 	}
@@ -105,10 +104,13 @@ func ServeWs(c *gin.Context) error {
 	var userId int
 	var userModel model.User
 
-	roomIdStr := c.Param("roomId")
+	clubIdStr := c.Param("clubId")
 	w := c.Writer
 	r := c.Request
-	roomId, err := strconv.Atoi(roomIdStr)
+	clubId, err := strconv.Atoi(clubIdStr)
+	if err != nil {
+		return err
+	}
 
 	if value, ok := c.GetQuery("userId"); ok {
 		p, err := strconv.Atoi(value)
@@ -122,7 +124,7 @@ func ServeWs(c *gin.Context) error {
 		return appError.AppError{Message: "userId is required"}
 	}
 
-	theSame, err := userModel.CompareUserAndClub(&userId, &roomId)
+	theSame, err := userModel.CompareUserAndClub(&userId, &clubId)
 	if err != nil {
 		return err
 	}
@@ -130,7 +132,7 @@ func ServeWs(c *gin.Context) error {
 		return appError.AppError{Message: "The user is not in the room."}
 	}
 
-	connections := H.rooms[roomId]
+	connections := H.rooms[clubId]
 	if connections != nil {
 		for _, v := range connections {
 			if v == userId {
@@ -144,7 +146,7 @@ func ServeWs(c *gin.Context) error {
 		return err
 	}
 	con := &connection{send: make(chan []byte, 256), ws: ws}
-	s := subscription{con, roomId, userId}
+	s := subscription{con, clubId, userId}
 	H.register <- s
 	go s.writePump()
 	go s.readPump()

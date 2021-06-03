@@ -7,7 +7,8 @@ import (
 	"club/controller/login"
 	"club/middleware"
 	"club/setting"
-	"club/ws"
+	"club/ws/club_ws"
+	"club/ws/user_ws"
 	"log"
 	"net/http"
 
@@ -30,7 +31,8 @@ func init() {
 }
 
 func main() {
-	go ws.H.Run()
+	go club_ws.H.Run()
+	go user_ws.H.Run()
 
 	router := initializeRoutes()
 	http.ListenAndServe(":8080", router)
@@ -63,7 +65,8 @@ func initializeRoutes() http.Handler {
 
 		wsRouter := v1Router.Group("/ws/")
 		{
-			wsRouter.GET("/:roomId", middleware.ErrorHandler(ws.ServeWs))
+			wsRouter.GET("/user/:userId", middleware.ErrorHandler(user_ws.ServeWs))
+			wsRouter.GET("/club/:roomId", middleware.ErrorHandler(club_ws.ServeWs))
 		}
 	}
 

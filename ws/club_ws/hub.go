@@ -1,4 +1,4 @@
-package ws
+package club_ws
 
 import (
 	"club/model"
