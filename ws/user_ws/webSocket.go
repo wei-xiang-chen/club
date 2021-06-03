@@ -62,8 +62,8 @@ func (s subscription) readPump() {
 			break
 		}
 
-		m := message{msg, s.userId}
-		H.broadcast <- m
+		m := Message{msg, s.userId}
+		H.Broadcast <- m
 	}
 }
 
@@ -120,7 +120,7 @@ func ServeWs(c *gin.Context) error {
 		return appError.AppError{Message: "The user does not exist."}
 	}
 
-	conn := H.users[userId]
+	conn := H.Users[userId]
 	if conn != nil {
 		return appError.AppError{Message: "Repeat connection."}
 	}

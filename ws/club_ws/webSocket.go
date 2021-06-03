@@ -3,6 +3,7 @@ package club_ws
 import (
 	"club/model"
 	appError "club/pojo/error"
+	"club/ws/user_ws"
 	"log"
 	"net/http"
 	"strconv"
@@ -100,50 +101,54 @@ func (s *subscription) writePump() {
 }
 
 // serveWs handles websocket requests from the peer.
-func ServeWs(c *gin.Context) error {
+func ServeWs(c *gin.Context) (*int, error) {
 	var userId int
 	var userModel model.User
+
+	if value, ok := c.GetQuery("userId"); ok {
+		p, err := strconv.Atoi(value)
+		if err != nil {
+			return nil, err
+		}
+
+		userId = p
+	} else {
+		userId = 0
+		return nil, appError.AppError{Message: "userId is required"}
+	}
+
+	if _, ok := user_ws.H.Users[userId]; !ok {
+		return nil, appError.AppError{Message: "The user's connection is not exist."}
+	}
 
 	clubIdStr := c.Param("clubId")
 	w := c.Writer
 	r := c.Request
 	clubId, err := strconv.Atoi(clubIdStr)
 	if err != nil {
-		return err
-	}
-
-	if value, ok := c.GetQuery("userId"); ok {
-		p, err := strconv.Atoi(value)
-		if err != nil {
-			return err
-		}
-
-		userId = p
-	} else {
-		userId = 0
-		return appError.AppError{Message: "userId is required"}
+		return &userId, err
 	}
 
 	theSame, err := userModel.CompareUserAndClub(&userId, &clubId)
 	if err != nil {
-		return err
+		return &userId, err
 	}
 	if !theSame {
-		return appError.AppError{Message: "The user is not in the room."}
+		return &userId, appError.AppError{Message: "The user is not in the room."}
 	}
 
 	connections := H.rooms[clubId]
 	if connections != nil {
 		for _, v := range connections {
 			if v == userId {
-				return appError.AppError{Message: "Repeat connection."}
+				return &userId, appError.AppError{Message: "Repeat connection."}
 			}
 		}
 	}
 
 	ws, err := upgrader.Upgrade(w, r, nil)
 	if err != nil {
-		return err
+		return &userId, err
 	}
 	con := &connection{send: make(chan []byte, 256), ws: ws}
 	s := subscription{con, clubId, userId}
@@ -151,5 +156,5 @@ func ServeWs(c *gin.Context) error {
 	go s.writePump()
 	go s.readPump()
 
-	return nil
+	return nil, nil
 }

@@ -5,9 +5,9 @@ import (
 	"time"
 )
 
-type message struct {
-	data []byte
-	user int
+type Message struct {
+	Data []byte
+	User int
 }
 
 type subscription struct {
@@ -19,10 +19,10 @@ type subscription struct {
 // connections.
 type hub struct {
 	// Registered connections.
-	users map[int]*connection
+	Users map[int]*connection
 
 	// Inbound messages from the connections.
-	broadcast chan message
+	Broadcast chan Message
 
 	// Register requests from the connections.
 	register chan subscription
@@ -32,10 +32,10 @@ type hub struct {
 }
 
 var H = hub{
-	broadcast:  make(chan message),
+	Broadcast:  make(chan Message),
 	register:   make(chan subscription),
 	unregister: make(chan subscription),
-	users:      make(map[int]*connection),
+	Users:      make(map[int]*connection),
 }
 
 func (h *hub) Run() {
@@ -44,26 +44,28 @@ func (h *hub) Run() {
 	for {
 		select {
 		case s := <-h.register:
-			connection := h.users[s.userId]
+			connection := h.Users[s.userId]
 			if connection == nil {
-				h.users[s.userId] = s.conn
+				h.Users[s.userId] = s.conn
 			}
 		case s := <-h.unregister:
-			connection := h.users[s.userId]
+			connection := h.Users[s.userId]
 			if connection != nil {
 				time.Sleep(time.Second * 2)
 
-				delete(h.users, s.userId)
+				delete(h.Users, s.userId)
 				close(s.conn.send)
 				userModel.DeleteUserById(&s.userId)
 			}
-		case m := <-h.broadcast:
-			connection := h.users[m.user]
-			select {
-			case connection.send <- m.data:
-			default:
-				close(connection.send)
-				delete(h.users, m.user)
+		case m := <-h.Broadcast:
+			connection := h.Users[m.User]
+			if connection != nil {
+				select {
+				case connection.send <- m.Data:
+				default:
+					close(connection.send)
+					delete(h.Users, m.User)
+				}
 			}
 		}
 	}
