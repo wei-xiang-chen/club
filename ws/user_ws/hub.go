@@ -1,10 +1,5 @@
 package user_ws
 
-import (
-	"club/model"
-	"time"
-)
-
 type Message struct {
 	Data []byte
 	User int
@@ -39,7 +34,6 @@ var H = hub{
 }
 
 func (h *hub) Run() {
-	var userModel model.User
 
 	for {
 		select {
@@ -51,11 +45,8 @@ func (h *hub) Run() {
 		case s := <-h.unregister:
 			connection := h.Users[s.userId]
 			if connection != nil {
-				time.Sleep(time.Second * 2)
-
 				delete(h.Users, s.userId)
 				close(s.conn.send)
-				userModel.DeleteUserById(&s.userId)
 			}
 		case m := <-h.Broadcast:
 			connection := h.Users[m.User]
