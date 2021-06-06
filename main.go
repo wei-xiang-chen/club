@@ -6,6 +6,7 @@ import (
 	"club/controller/code"
 	"club/controller/login"
 	"club/middleware"
+	"club/schedule"
 	"club/setting"
 	"club/ws/club_ws"
 	"club/ws/user_ws"
@@ -33,6 +34,7 @@ func init() {
 func main() {
 	go club_ws.H.Run()
 	go user_ws.H.Run()
+	go schedule.DeleteExpiredUser()
 
 	router := initializeRoutes()
 	http.ListenAndServe(":8080", router)

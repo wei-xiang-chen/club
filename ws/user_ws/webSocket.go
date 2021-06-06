@@ -125,6 +125,11 @@ func ServeWs(c *gin.Context) error {
 		return appError.AppError{Message: "Repeat connection."}
 	}
 
+	err = userModel.UpdateDisconnectionTime(&userId, nil)
+	if err != nil {
+		return err
+	}
+
 	ws, err := upgrader.Upgrade(w, r, nil)
 	if err != nil {
 		return err

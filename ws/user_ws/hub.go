@@ -1,5 +1,11 @@
 package user_ws
 
+import (
+	"club/model"
+	"log"
+	"time"
+)
+
 type Message struct {
 	Data []byte
 	User int
@@ -35,6 +41,8 @@ var H = hub{
 
 func (h *hub) Run() {
 
+	var userModel model.User
+
 	for {
 		select {
 		case s := <-h.register:
@@ -47,6 +55,12 @@ func (h *hub) Run() {
 			if connection != nil {
 				delete(h.Users, s.userId)
 				close(s.conn.send)
+			}
+
+			currentTime := time.Now()
+			err := userModel.UpdateDisconnectionTime(&s.userId, &currentTime)
+			if err != nil {
+				log.Printf("error: %v", err)
 			}
 		case m := <-h.Broadcast:
 			connection := h.Users[m.User]

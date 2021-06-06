@@ -3,15 +3,17 @@ package model
 import (
 	"club/client"
 	"club/pojo"
+	"time"
 
 	"github.com/jinzhu/gorm"
 )
 
 type User struct {
-	Id       int     `gorm:"primaryKey" json:"id"`
-	Uid      *string `json:"uid"`
-	Nickname *string `json:"nickname"`
-	ClubId   *int    `gorm:"column:club_id" json:"clubId"`
+	Id                int        `gorm:"primaryKey" json:"id"`
+	Uid               *string    `json:"uid"`
+	Nickname          *string    `json:"nickname"`
+	ClubId            *int       `gorm:"column:club_id" json:"clubId"`
+	DisconnectionTIme *time.Time `gorm:"column:disconnection_time" json:"disconnectionTIme"`
 }
 
 func (u *User) TableName() string {
@@ -114,4 +116,24 @@ func (u *User) CompareUserAndClub(id *int, clubId *int) (bool, error) {
 	} else {
 		return false, nil
 	}
+}
+
+func (u *User) UpdateDisconnectionTime(id *int, time *time.Time) error {
+
+	if err := client.DBEngine.Table(u.TableName()).Where("id = ?", *id).Update("disconnection_time", time).Error; err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (u *User) DeleteExpired(time *time.Time) error {
+
+	if err := client.DBEngine.Debug().Table(u.TableName()).Where("disconnection_time < ?", time).Delete(&User{}).Error; err != nil {
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
 }
