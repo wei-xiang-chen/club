@@ -50,7 +50,7 @@ func Join(userId *int, clubId *int) error {
 	if err != nil {
 		return err
 	}
-	if originalClubId != nil {
+	if originalClubId != nil && *originalClubId != *clubId {
 		return appError.AppError{Message: "The user already in the room. Please leave the room first."}
 	}
 
