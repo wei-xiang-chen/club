@@ -129,7 +129,7 @@ func (u *User) UpdateDisconnectionTime(id *int, time *time.Time) error {
 
 func (u *User) DeleteExpired(time *time.Time) error {
 
-	if err := client.DBEngine.Debug().Table(u.TableName()).Where("disconnection_time < ?", time).Delete(&User{}).Error; err != nil {
+	if err := client.DBEngine.Debug().Table(u.TableName()).Where("disconnection_time <= ?", time).Delete(&User{}).Error; err != nil {
 		if err != nil {
 			return err
 		}

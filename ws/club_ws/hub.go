@@ -2,8 +2,6 @@ package club_ws
 
 import (
 	"club/model"
-	"club/service/club_service"
-	"log"
 )
 
 type message struct {
@@ -11,9 +9,9 @@ type message struct {
 	room int
 }
 
-type subscription struct {
+type Subscription struct {
 	conn   *connection
-	room   int
+	Room   int
 	userId int
 }
 
@@ -27,16 +25,19 @@ type hub struct {
 	broadcast chan message
 
 	// Register requests from the connections.
-	register chan subscription
+	register chan Subscription
 
 	// Unregister requests from connections.
-	unregister chan subscription
+	unregister chan Subscription
+
+	CloseRoom chan Subscription
 }
 
 var H = hub{
 	broadcast:  make(chan message),
-	register:   make(chan subscription),
-	unregister: make(chan subscription),
+	register:   make(chan Subscription),
+	unregister: make(chan Subscription),
+	CloseRoom:  make(chan Subscription),
 	rooms:      make(map[int]map[*connection]int),
 }
 
@@ -46,49 +47,36 @@ func (h *hub) Run() {
 	for {
 		select {
 		case s := <-h.register:
-			connections := h.rooms[s.room]
+			connections := h.rooms[s.Room]
 			if connections == nil {
 				connections = make(map[*connection]int)
-				h.rooms[s.room] = connections
+				h.rooms[s.Room] = connections
 			}
 
-			h.rooms[s.room][s.conn] = s.userId
+			h.rooms[s.Room][s.conn] = s.userId
 
-			papulation := len(h.rooms[s.room])
-			clubModel.UpdatePopulation(&s.room, &papulation)
+			papulation := len(h.rooms[s.Room])
+			clubModel.UpdatePopulation(&s.Room, &papulation)
 		case s := <-h.unregister:
-			connections := h.rooms[s.room]
+			connections := h.rooms[s.Room]
 			if connections != nil {
 				if _, ok := connections[s.conn]; ok {
-					isOwner, err := clubModel.CheckOwnerByUserId(&s.userId)
-					if err != nil {
-						log.Printf("error: %v", err.Error())
-					}
+					delete(connections, s.conn)
+					close(s.conn.send)
 
-					err = club_service.Leave(&s.userId)
-					if err != nil {
-						log.Printf("error: %v", err.Error())
-					}
-
-					if isOwner == true {
-						for k := range connections {
-							delete(connections, k)
-							close(k.send)
-						}
-
-						delete(h.rooms, s.room)
-					} else {
-						delete(connections, s.conn)
-						close(s.conn.send)
-
-						if len(connections) == 0 {
-							delete(h.rooms, s.room)
-						}
-						papulation := len(h.rooms[s.room])
-						clubModel.UpdatePopulation(&s.room, &papulation)
-					}
+					papulation := len(h.rooms[s.Room])
+					clubModel.UpdatePopulation(&s.Room, &papulation)
 				}
 			}
+		case s := <-h.CloseRoom:
+			connections := h.rooms[s.Room]
+
+			for k := range connections {
+				delete(connections, k)
+				close(k.send)
+			}
+
+			delete(h.rooms, s.Room)
 		case m := <-h.broadcast:
 			connections := h.rooms[m.room]
 			for c := range connections {

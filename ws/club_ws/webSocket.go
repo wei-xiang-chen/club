@@ -45,7 +45,7 @@ type connection struct {
 }
 
 // readPump pumps messages from the websocket connection to the hub.
-func (s subscription) readPump() {
+func (s Subscription) readPump() {
 	c := s.conn
 	defer func() {
 		H.unregister <- s
@@ -63,7 +63,7 @@ func (s subscription) readPump() {
 			break
 		}
 
-		m := message{msg, s.room}
+		m := message{msg, s.Room}
 		H.broadcast <- m
 	}
 }
@@ -75,7 +75,7 @@ func (c *connection) write(mt int, payload []byte) error {
 }
 
 // writePump pumps messages from the hub to the websocket connection.
-func (s *subscription) writePump() {
+func (s *Subscription) writePump() {
 	c := s.conn
 	ticker := time.NewTicker(pingPeriod)
 	defer func() {
@@ -151,7 +151,7 @@ func ServeWs(c *gin.Context) (*int, error) {
 		return &userId, err
 	}
 	con := &connection{send: make(chan []byte, 256), ws: ws}
-	s := subscription{con, clubId, userId}
+	s := Subscription{con, clubId, userId}
 	H.register <- s
 	go s.writePump()
 	go s.readPump()

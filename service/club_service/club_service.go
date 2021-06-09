@@ -4,6 +4,7 @@ import (
 	"club/model"
 	"club/pojo"
 	appError "club/pojo/error"
+	"club/ws/club_ws"
 )
 
 var (
@@ -79,6 +80,9 @@ func Leave(userId *int) error {
 		if err != nil {
 			return err
 		}
+
+		s := club_ws.Subscription{Room: club.Id}
+		club_ws.H.CloseRoom <- s
 	} else {
 		err = userModel.SetClubId(userId, nil)
 		if err != nil {

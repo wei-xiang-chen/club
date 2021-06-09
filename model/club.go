@@ -4,6 +4,7 @@ import (
 	"club/client"
 	"club/pojo"
 	appError "club/pojo/error"
+	"time"
 
 	"github.com/jinzhu/gorm"
 	"github.com/lib/pq"
@@ -63,6 +64,20 @@ func (c *Club) GetList(clubId *int, topic *string, clubName *string, offset *int
 	return clubs, nil
 }
 
+func (c *Club) FIndExpired(time *time.Time) (*[]Club, error) {
+	var clubs []Club
+
+	err := client.DBEngine.Table(c.TableName()).Select("club_clubs.id").Joins("LEFT JOIN club_user ON club_clubs.owner = club_user.id").Where("club_user.disconnection_time <= ?", *time).Find(&clubs).Error
+	if err != nil {
+		if err == gorm.ErrRecordNotFound {
+			return nil, nil
+		}
+		return nil, err
+	}
+
+	return &clubs, nil
+}
+
 func (c *Club) FindByOwner(owner *int) (*Club, error) {
 	var club Club
 
@@ -75,22 +90,6 @@ func (c *Club) FindByOwner(owner *int) (*Club, error) {
 	}
 
 	return &club, nil
-}
-
-func (c *Club) CheckOwnerByUserId(userId *int) (bool, error) {
-	var count int
-
-	if err := client.DBEngine.Table(c.TableName()).Where("owner = ?", *userId).Count(&count).Error; err != nil {
-		if err != nil {
-			return false, err
-		}
-	}
-
-	if count > 0 {
-		return true, nil
-	} else {
-		return false, nil
-	}
 }
 
 func (c *Club) CheckClubExist(id *int) (bool, error) {
