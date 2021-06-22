@@ -19,9 +19,9 @@ steps:
       from_secret: docker_username_hub #到drone上該專案的Repository裡的settings設定
     password: 
       from_secret: docker_password_hub #到drone上該專案的Repository裡的settings設定
-    # repo: 104.214.48.227:5000/wei-xiang-chen/club
-    # registry: 104.214.48.227:5000
-    repo: sharetheworld10/wei-xiang-chen/club
+    repo: 104.214.48.227:5000/wei-xiang-chen/club
+    registry: 104.214.48.227:5000
+    # repo: sharetheworld10/wei-xiang-chen/club
     insecure: true
     auto_tag: true
   when:
