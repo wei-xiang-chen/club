@@ -2,6 +2,10 @@ package club_ws
 
 import (
 	"club/model"
+	"club/pojo"
+	"club/ws/user_ws"
+	"encoding/json"
+	"log"
 )
 
 type message struct {
@@ -71,7 +75,15 @@ func (h *hub) Run() {
 		case s := <-h.CloseRoom:
 			connections := h.rooms[s.Room]
 
-			for k := range connections {
+			for k, userId := range connections {
+				userConnection := user_ws.H.Users[userId]
+				wsMsg := pojo.WsMsg{Action: "leave", Message: "The owner has left."}
+				msgString, err := json.Marshal(wsMsg)
+				if err != nil {
+					log.Printf("error: %v", err)
+					return
+				}
+				userConnection.Send <- msgString
 				delete(connections, k)
 				close(k.send)
 			}

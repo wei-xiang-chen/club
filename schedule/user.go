@@ -12,7 +12,7 @@ func DeleteExpiredUser() {
 	var clubModel model.Club
 
 	for {
-		targetTime := time.Now().Add(-5 * time.Minute)
+		targetTime := time.Now().Add(-1 * time.Minute)
 		clubs, err := clubModel.FIndExpired(&targetTime)
 		if err != nil {
 			log.Printf("error: %v", err)

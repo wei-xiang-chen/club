@@ -35,12 +35,12 @@ var upgrader = websocket.Upgrader{
 }
 
 // connection is an middleman between the websocket connection and the hub.
-type connection struct {
+type Connection struct {
 	// The websocket connection.
 	ws *websocket.Conn
 
 	// Buffered channel of outbound messages.
-	send chan []byte
+	Send chan []byte
 }
 
 // readPump pumps messages from the websocket connection to the hub.
@@ -68,7 +68,7 @@ func (s subscription) readPump() {
 }
 
 // write writes a message with the given message type and payload.
-func (c *connection) write(mt int, payload []byte) error {
+func (c *Connection) write(mt int, payload []byte) error {
 	c.ws.SetWriteDeadline(time.Now().Add(writeWait))
 	return c.ws.WriteMessage(mt, payload)
 }
@@ -83,7 +83,7 @@ func (s *subscription) writePump() {
 	}()
 	for {
 		select {
-		case message, ok := <-c.send:
+		case message, ok := <-c.Send:
 			if !ok {
 				c.write(websocket.CloseMessage, []byte{})
 				return
@@ -134,7 +134,7 @@ func ServeWs(c *gin.Context) error {
 	if err != nil {
 		return err
 	}
-	con := &connection{send: make(chan []byte, 256), ws: ws}
+	con := &Connection{Send: make(chan []byte, 256), ws: ws}
 	s := subscription{con, userId}
 	H.register <- s
 	go s.writePump()

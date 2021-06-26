@@ -12,7 +12,7 @@ type Message struct {
 }
 
 type subscription struct {
-	conn   *connection
+	conn   *Connection
 	userId int
 }
 
@@ -20,7 +20,7 @@ type subscription struct {
 // connections.
 type hub struct {
 	// Registered connections.
-	Users map[int]*connection
+	Users map[int]*Connection
 
 	// Inbound messages from the connections.
 	Broadcast chan Message
@@ -36,7 +36,7 @@ var H = hub{
 	Broadcast:  make(chan Message),
 	register:   make(chan subscription),
 	unregister: make(chan subscription),
-	Users:      make(map[int]*connection),
+	Users:      make(map[int]*Connection),
 }
 
 func (h *hub) Run() {
@@ -54,7 +54,7 @@ func (h *hub) Run() {
 			connection := h.Users[s.userId]
 			if connection != nil {
 				delete(h.Users, s.userId)
-				close(s.conn.send)
+				close(s.conn.Send)
 			}
 
 			currentTime := time.Now()
@@ -66,9 +66,9 @@ func (h *hub) Run() {
 			connection := h.Users[m.User]
 			if connection != nil {
 				select {
-				case connection.send <- m.Data:
+				case connection.Send <- m.Data:
 				default:
-					close(connection.send)
+					close(connection.Send)
 					delete(h.Users, m.User)
 				}
 			}
