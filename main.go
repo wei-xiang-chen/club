@@ -13,6 +13,7 @@ import (
 	"log"
 	"net/http"
 
+	"github.com/gin-contrib/gzip"
 	"github.com/gin-gonic/gin"
 	"github.com/rs/cors"
 )
@@ -47,12 +48,12 @@ func initializeRoutes() http.Handler {
 
 	v1Router := router.Group("/api/v1/")
 	{
-		loginRouter := v1Router.Group("/login/")
+		loginRouter := v1Router.Group("/login/").Use(gzip.Gzip(gzip.DefaultCompression))
 		{
 			loginRouter.POST("/", middleware.ErrorHandler(login.Login))
 		}
 
-		clubRouter := v1Router.Group("/club/").Use(middleware.UidAuth())
+		clubRouter := v1Router.Group("/club/").Use(gzip.Gzip(gzip.DefaultCompression)).Use(middleware.UidAuth())
 		{
 			clubRouter.GET("/", middleware.ErrorHandler(club.GetList))
 			clubRouter.POST("/", middleware.ErrorHandler(club.Create))
@@ -60,7 +61,7 @@ func initializeRoutes() http.Handler {
 			clubRouter.POST("/leave/", middleware.ErrorHandler(club.Leave))
 		}
 
-		codeRouter := v1Router.Group("/code/").Use(middleware.UidAuth())
+		codeRouter := v1Router.Group("/code/").Use(gzip.Gzip(gzip.DefaultCompression)).Use(middleware.UidAuth())
 		{
 			codeRouter.GET("/", middleware.ErrorHandler(code.Code))
 		}
