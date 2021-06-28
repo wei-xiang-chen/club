@@ -1,7 +1,7 @@
 package user_ws
 
 import (
-	"club/model"
+	"club/dao"
 	"log"
 	"time"
 )
@@ -41,7 +41,7 @@ var H = hub{
 
 func (h *hub) Run() {
 
-	var userModel model.User
+	var userModel dao.User
 
 	for {
 		select {

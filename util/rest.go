@@ -1,14 +1,14 @@
 package util
 
 import (
-	"club/pojo"
+	"club/model"
 	"strconv"
 
 	"github.com/gin-gonic/gin"
 )
 
-func GetUser(c *gin.Context) (*pojo.User, error) {
-	var user pojo.User
+func GetUser(c *gin.Context) (*model.User, error) {
+	var user model.User
 
 	user.Uid = c.Request.Header.Get("X-Request-UID")
 	i, err := strconv.Atoi(c.Request.Header.Get("ID"))

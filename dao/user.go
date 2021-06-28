@@ -1,8 +1,8 @@
-package model
+package dao
 
 import (
 	"club/client"
-	"club/pojo"
+	"club/model"
 	"time"
 
 	"github.com/jinzhu/gorm"
@@ -20,7 +20,7 @@ func (u *User) TableName() string {
 	return "club_user"
 }
 
-func (u *User) Insert(user *pojo.User) error {
+func (u *User) Insert(user *model.User) error {
 
 	if err := client.DBEngine.Table(u.TableName()).Create(user).Error; err == nil {
 		return err

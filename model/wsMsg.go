@@ -1,4 +1,4 @@
-package pojo
+package model
 
 type WsMsg struct {
 	Action  string `json:"action"`

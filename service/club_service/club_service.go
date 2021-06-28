@@ -1,18 +1,18 @@
 package club_service
 
 import (
+	"club/dao"
 	"club/model"
-	"club/pojo"
-	appError "club/pojo/error"
+	appError "club/model/error"
 	"club/ws/club_ws"
 )
 
 var (
-	clubModel model.Club
-	userModel model.User
+	clubModel dao.Club
+	userModel dao.User
 )
 
-func GetList(clubId *int, topic *string, clubName *string, offset *int, limit *int) ([]*model.Club, error) {
+func GetList(clubId *int, topic *string, clubName *string, offset *int, limit *int) ([]*dao.Club, error) {
 
 	clubs, err := clubModel.GetList(clubId, topic, clubName, offset, limit)
 	if err != nil {
@@ -22,7 +22,7 @@ func GetList(clubId *int, topic *string, clubName *string, offset *int, limit *i
 	return clubs, nil
 }
 
-func Insert(club *pojo.Club) error {
+func Insert(club *model.Club) error {
 
 	err := clubModel.Insert(club)
 	if err != nil {

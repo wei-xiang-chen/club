@@ -1,8 +1,8 @@
 package club_ws
 
 import (
+	"club/dao"
 	"club/model"
-	"club/pojo"
 	"club/ws/user_ws"
 	"encoding/json"
 	"log"
@@ -46,7 +46,7 @@ var H = hub{
 }
 
 func (h *hub) Run() {
-	var clubModel model.Club
+	var clubModel dao.Club
 
 	for {
 		select {
@@ -77,7 +77,7 @@ func (h *hub) Run() {
 
 			for k, userId := range connections {
 				userConnection := user_ws.H.Users[userId]
-				wsMsg := pojo.WsMsg{Action: "leave", Message: "The owner has left."}
+				wsMsg := model.WsMsg{Action: "leave", Message: "The owner has left."}
 				msgString, err := json.Marshal(wsMsg)
 				if err != nil {
 					log.Printf("error: %v", err)

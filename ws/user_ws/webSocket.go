@@ -1,8 +1,8 @@
 package user_ws
 
 import (
-	"club/model"
-	appError "club/pojo/error"
+	"club/dao"
+	appError "club/model/error"
 	"log"
 	"net/http"
 	"strconv"
@@ -101,7 +101,7 @@ func (s *subscription) writePump() {
 
 // serveWs handles websocket requests from the peer.
 func ServeWs(c *gin.Context) error {
-	var userModel model.User
+	var userModel dao.User
 
 	w := c.Writer
 	r := c.Request

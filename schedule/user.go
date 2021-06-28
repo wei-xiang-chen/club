@@ -1,15 +1,15 @@
 package schedule
 
 import (
-	"club/model"
+	"club/dao"
 	"club/ws/club_ws"
 	"log"
 	"time"
 )
 
 func DeleteExpiredUser() {
-	var userModel model.User
-	var clubModel model.Club
+	var userModel dao.User
+	var clubModel dao.Club
 
 	for {
 		targetTime := time.Now().Add(-1 * time.Minute)

@@ -1,17 +1,17 @@
 package user_service
 
 import (
+	"club/dao"
 	"club/model"
-	"club/pojo"
 
 	uuid "github.com/satori/go.uuid"
 )
 
 var (
-	userModel model.User
+	userModel dao.User
 )
 
-func Insert(user *pojo.User) (*pojo.User, error) {
+func Insert(user *model.User) (*model.User, error) {
 
 	user.Uid = uuid.NewV4().String()
 

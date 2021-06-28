@@ -1,9 +1,9 @@
 package club
 
 import (
-	"club/pojo"
-	appError "club/pojo/error"
-	"club/pojo/rest"
+	"club/model"
+	appError "club/model/error"
+	"club/model/rest"
 	"club/service/club_service"
 	"club/service/code_service"
 	"club/util"
@@ -47,7 +47,7 @@ func GetList(c *gin.Context) error {
 }
 
 func Create(c *gin.Context) error {
-	var club pojo.Club
+	var club model.Club
 	var restResult rest.RestResult
 
 	c.ShouldBindJSON(&club)
