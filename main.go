@@ -6,10 +6,14 @@ import (
 	"club/controller/code"
 	"club/controller/login"
 	"club/middleware"
+	"club/schedule"
 	"club/setting"
+	"club/ws/club_ws"
+	"club/ws/user_ws"
 	"log"
 	"net/http"
 
+	"github.com/gin-contrib/gzip"
 	"github.com/gin-gonic/gin"
 	"github.com/rs/cors"
 )
@@ -29,6 +33,9 @@ func init() {
 }
 
 func main() {
+	go club_ws.H.Run()
+	go user_ws.H.Run()
+	go schedule.DeleteExpiredUser()
 
 	router := initializeRoutes()
 	http.ListenAndServe(":8080", router)
@@ -41,12 +48,12 @@ func initializeRoutes() http.Handler {
 
 	v1Router := router.Group("/api/v1/")
 	{
-		loginRouter := v1Router.Group("/login/")
+		loginRouter := v1Router.Group("/login/").Use(gzip.Gzip(gzip.DefaultCompression))
 		{
 			loginRouter.POST("/", middleware.ErrorHandler(login.Login))
 		}
 
-		clubRouter := v1Router.Group("/club/").Use(middleware.UidAuth())
+		clubRouter := v1Router.Group("/club/").Use(gzip.Gzip(gzip.DefaultCompression)).Use(middleware.UidAuth())
 		{
 			clubRouter.GET("/", middleware.ErrorHandler(club.GetList))
 			clubRouter.POST("/", middleware.ErrorHandler(club.Create))
@@ -54,9 +61,15 @@ func initializeRoutes() http.Handler {
 			clubRouter.POST("/leave/", middleware.ErrorHandler(club.Leave))
 		}
 
-		codeRouter := v1Router.Group("/code/").Use(middleware.UidAuth())
+		codeRouter := v1Router.Group("/code/").Use(gzip.Gzip(gzip.DefaultCompression)).Use(middleware.UidAuth())
 		{
 			codeRouter.GET("/", middleware.ErrorHandler(code.Code))
+		}
+
+		wsRouter := v1Router.Group("/ws/")
+		{
+			wsRouter.GET("/user/:userId", middleware.ErrorHandler(user_ws.ServeWs))
+			wsRouter.GET("/club/:clubId", middleware.WsErrorHandler(club_ws.ServeWs))
 		}
 	}
 

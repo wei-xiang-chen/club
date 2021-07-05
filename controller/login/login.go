@@ -1,8 +1,8 @@
 package login
 
 import (
-	"club/pojo"
-	"club/pojo/rest"
+	"club/model"
+	"club/model/rest"
 	"club/service/user_service"
 	"net/http"
 
@@ -11,7 +11,7 @@ import (
 
 func Login(c *gin.Context) error {
 	var restResult rest.RestResult
-	var login pojo.User
+	var login model.User
 
 	c.ShouldBindJSON(&login)
 

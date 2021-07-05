@@ -1,8 +1,8 @@
 package middleware
 
 import (
-	"club/model"
-	"club/pojo/rest"
+	"club/dao"
+	"club/model/rest"
 	"net/http"
 	"strconv"
 
@@ -15,9 +15,9 @@ func UidAuth() gin.HandlerFunc {
 		var restError rest.RestError
 
 		if uid := c.Request.Header.Get("X-Request-UID"); uid != "" {
-			var user *model.User
+			var user *dao.User
 
-			user, err := user.FindUserByUid(uid)
+			user, err := user.FindUserByUid(&uid)
 			if err != nil {
 				restError.Description = err.Error()
 				restResult.Error = &restError

@@ -1,7 +1,7 @@
 package code
 
 import (
-	"club/pojo/rest"
+	"club/model/rest"
 	"club/service/code_service"
 	"net/http"
 

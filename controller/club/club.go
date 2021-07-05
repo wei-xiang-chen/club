@@ -1,49 +1,42 @@
 package club
 
 import (
-	"club/pojo"
-	"club/pojo/rest"
+	"club/model"
+	appError "club/model/error"
+	"club/model/rest"
 	"club/service/club_service"
-	rest_util "club/util/rest"
+	"club/service/code_service"
+	"club/util"
 	"net/http"
 	"strconv"
 
 	"github.com/gin-gonic/gin"
 )
 
-var (
-	pageDefaultS  string = "1"
-	limitDefaultS string = "10"
-)
-
 func GetList(c *gin.Context) error {
-	var page, limit int
+	var topic, clubName *string
+	var clubId, offset, limit *int
 	var restResult rest.RestResult
 
-	topic := c.Query("topic")
-	clubName := c.Query("clubName")
-
-	pageString := c.Query("page")
-	limitString := c.Query("limit")
-	if pageString == "" {
-		pageString = pageDefaultS
+	if value, ok := c.GetQuery("clubId"); ok {
+		c, err := strconv.Atoi(value)
+		if err != nil {
+			return err
+		}
+		clubId = &c
 	}
-	if limitString == "" {
-		limitString = limitDefaultS
+	if value, ok := c.GetQuery("topic"); ok {
+		topic = &value
 	}
-
-	page, err := strconv.Atoi(pageString)
+	if value, ok := c.GetQuery("clubName"); ok {
+		clubName = &value
+	}
+	offset, limit, err := util.GetPagination(c)
 	if err != nil {
 		return err
 	}
 
-	limit, err = strconv.Atoi(limitString)
-	if err != nil {
-		return err
-	}
-
-	offset := (page - 1) * limit
-	clubs, err := club_service.GetList(topic, clubName, offset, limit)
+	clubs, err := club_service.GetList(clubId, topic, clubName, offset, limit)
 	if err != nil {
 		return err
 	}
@@ -54,17 +47,27 @@ func GetList(c *gin.Context) error {
 }
 
 func Create(c *gin.Context) error {
-	var club pojo.Club
+	var club model.Club
 	var restResult rest.RestResult
 
 	c.ShouldBindJSON(&club)
 
-	user, err := rest_util.GetUser(c)
+	if club.ClubName == nil || club.Topic == nil {
+		return appError.AppError{Message: "Check request body. Required fields are not filled."}
+	}
+
+	err := code_service.CheckCode("clubs_topic", club.Topic)
 	if err != nil {
 		return err
 	}
 
-	club.Owner = user.Id
+	user, err := util.GetUser(c)
+	if err != nil {
+		return err
+	}
+
+	club.Owner = &user.Id
+
 	err = club_service.Insert(&club)
 	if err != nil {
 		return err
@@ -77,19 +80,18 @@ func Create(c *gin.Context) error {
 
 func Join(c *gin.Context) error {
 
-	clubIdString := c.Param("clubId")
-	clubId, err := strconv.Atoi(clubIdString)
+	clubId, err := strconv.Atoi(c.Param("clubId"))
 
 	if err != nil {
 		return err
 	}
 
-	user, err := rest_util.GetUser(c)
+	user, err := util.GetUser(c)
 	if err != nil {
 		return err
 	}
 
-	err = club_service.Join(user.Id, clubId)
+	err = club_service.Join(&user.Id, &clubId)
 	if err != nil {
 		return err
 	}
@@ -100,12 +102,12 @@ func Join(c *gin.Context) error {
 
 func Leave(c *gin.Context) error {
 
-	user, err := rest_util.GetUser(c)
+	user, err := util.GetUser(c)
 	if err != nil {
 		return err
 	}
 
-	err = club_service.Leave(user.Id)
+	err = club_service.Leave(&user.Id)
 	if err != nil {
 		return err
 	}

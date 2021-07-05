@@ -1,16 +1,18 @@
 package code_service
 
 import (
-	"club/model"
+	"club/dao"
+	appError "club/model/error"
+	"strings"
 )
 
 var (
-	codemodel model.Code
+	codemodel dao.Code
 )
 
-func Code(types []string) (*map[string][]model.Code, error) {
-	var newCodes map[string][]model.Code
-	newCodes = make(map[string][]model.Code)
+func Code(types []string) (*map[string][]dao.Code, error) {
+	var newCodes map[string][]dao.Code
+	newCodes = make(map[string][]dao.Code)
 
 	codes, err := codemodel.GetByTypes(types)
 	if err != nil {
@@ -20,14 +22,14 @@ func Code(types []string) (*map[string][]model.Code, error) {
 
 	if codes != nil {
 		var t string
-		codeSlice := []model.Code{}
+		codeSlice := []dao.Code{}
 		t = c[0].Type
 
 		for _, code := range c {
 			if code.Type != t {
 				newCodes[t] = codeSlice
 				t = code.Type
-				codeSlice = []model.Code{}
+				codeSlice = []dao.Code{}
 			}
 
 			codeSlice = append(codeSlice, code)
@@ -36,4 +38,19 @@ func Code(types []string) (*map[string][]model.Code, error) {
 	}
 
 	return &newCodes, nil
+}
+
+func CheckCode(_type string, option *string) error {
+	*option = strings.ToUpper(*option)
+
+	count, err := codemodel.CheckCode(_type, *option)
+	if err != nil {
+		return err
+	}
+
+	if *count > 0 {
+		return nil
+	} else {
+		return appError.AppError{Message: "Code is illegal." + "[" + *option + "]"}
+	}
 }
