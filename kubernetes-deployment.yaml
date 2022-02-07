@@ -1,0 +1,21 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: club-backend-deployment
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: demoApp
+    spec:
+      containers:
+      - name: club-backend
+        image: wei-xiang-chen/club
+        ports:
+        - containerPort: 8080
+      imagePullSecrets:
+      - name: regcred
+  selector:
+    matchLabels:
+      app: demoApp

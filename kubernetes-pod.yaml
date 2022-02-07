@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: club-backend-pod
+  labels:
+    app: demoApp
+spec:
+  containers:
+    - name: club-backend
+      image: 104.214.48.227:5000/wei-xiang-chen/club
+      ports:
+        - containerPort: 8080

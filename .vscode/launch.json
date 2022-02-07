@@ -11,5 +11,8 @@
             "mode": "debug",
             "program": "${workspaceFolder}"
         }
-    ]
+    ],
+    "go.delveConfig":{
+        "debugAdapter":"legacy"
+    }
 }
