@@ -5,7 +5,7 @@ import (
 	"club/controllers/club"
 	"club/controllers/code"
 	"club/controllers/login"
-	"club/middleware"
+	"club/middlewares"
 	schedule "club/schedules"
 	"club/setting"
 	"club/ws/club_ws"
@@ -50,26 +50,26 @@ func initializeRoutes() http.Handler {
 	{
 		loginRouter := v1Router.Group("/login/").Use(gzip.Gzip(gzip.DefaultCompression))
 		{
-			loginRouter.POST("/", middleware.ErrorHandler(login.Login))
+			loginRouter.POST("/", middlewares.ErrorHandler(login.Login))
 		}
 
-		clubRouter := v1Router.Group("/club/").Use(gzip.Gzip(gzip.DefaultCompression)).Use(middleware.UidAuth())
+		clubRouter := v1Router.Group("/club/").Use(gzip.Gzip(gzip.DefaultCompression)).Use(middlewares.UidAuth())
 		{
-			clubRouter.GET("/", middleware.ErrorHandler(club.GetList))
-			clubRouter.POST("/", middleware.ErrorHandler(club.Create))
-			clubRouter.POST("/join/:clubId", middleware.ErrorHandler(club.Join))
-			clubRouter.POST("/leave/", middleware.ErrorHandler(club.Leave))
+			clubRouter.GET("/", middlewares.ErrorHandler(club.GetList))
+			clubRouter.POST("/", middlewares.ErrorHandler(club.Create))
+			clubRouter.POST("/join/:clubId", middlewares.ErrorHandler(club.Join))
+			clubRouter.POST("/leave/", middlewares.ErrorHandler(club.Leave))
 		}
 
-		codeRouter := v1Router.Group("/code/").Use(gzip.Gzip(gzip.DefaultCompression)).Use(middleware.UidAuth())
+		codeRouter := v1Router.Group("/code/").Use(gzip.Gzip(gzip.DefaultCompression)).Use(middlewares.UidAuth())
 		{
-			codeRouter.GET("/", middleware.ErrorHandler(code.Code))
+			codeRouter.GET("/", middlewares.ErrorHandler(code.Code))
 		}
 
 		wsRouter := v1Router.Group("/ws/")
 		{
-			wsRouter.GET("/user/:userId", middleware.ErrorHandler(user_ws.ServeWs))
-			wsRouter.GET("/club/:clubId", middleware.WsErrorHandler(club_ws.ServeWs))
+			wsRouter.GET("/user/:userId", middlewares.ErrorHandler(user_ws.ServeWs))
+			wsRouter.GET("/club/:clubId", middlewares.WsErrorHandler(club_ws.ServeWs))
 		}
 	}
 

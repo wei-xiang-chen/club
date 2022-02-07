@@ -16,6 +16,7 @@ type Club struct {
 	Topic      *string `json:"topic"`
 	Owner      *User   `gorm:"embedded" json:"owner"`
 	Population *int    `json:"population"`
+	db         *gorm.DB
 }
 
 func (c *Club) TableName() string {

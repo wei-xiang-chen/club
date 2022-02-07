@@ -1,4 +1,4 @@
-package middleware
+package middlewares
 
 import (
 	club_err "club/models/error"
