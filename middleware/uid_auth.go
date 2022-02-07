@@ -1,8 +1,8 @@
 package middleware
 
 import (
-	"club/dao"
-	"club/model/rest"
+	"club/dal"
+	"club/models/rest"
 	"net/http"
 	"strconv"
 
@@ -15,7 +15,7 @@ func UidAuth() gin.HandlerFunc {
 		var restError rest.RestError
 
 		if uid := c.Request.Header.Get("X-Request-UID"); uid != "" {
-			var user *dao.User
+			var user *dal.User
 
 			user, err := user.FindUserByUid(&uid)
 			if err != nil {

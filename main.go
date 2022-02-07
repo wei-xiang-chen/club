@@ -1,12 +1,12 @@
 package main
 
 import (
-	"club/client"
-	"club/controller/club"
-	"club/controller/code"
-	"club/controller/login"
+	"club/clients"
+	"club/controllers/club"
+	"club/controllers/code"
+	"club/controllers/login"
 	"club/middleware"
-	"club/schedule"
+	schedule "club/schedules"
 	"club/setting"
 	"club/ws/club_ws"
 	"club/ws/user_ws"
@@ -93,7 +93,7 @@ func setupSetting() error {
 func setupDBEngine() error {
 	var err error
 
-	client.DBEngine, err = client.NewDBEngine(setting.DatabaseSetting)
+	clients.DBEngine, err = clients.NewDBEngine(setting.DatabaseSetting)
 	if err != nil {
 		return err
 	}

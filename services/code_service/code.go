@@ -1,18 +1,18 @@
 package code_service
 
 import (
-	"club/dao"
-	appError "club/model/error"
+	"club/dal"
+	appError "club/models/error"
 	"strings"
 )
 
 var (
-	codemodel dao.Code
+	codemodel dal.Code
 )
 
-func Code(types []string) (*map[string][]dao.Code, error) {
-	var newCodes map[string][]dao.Code
-	newCodes = make(map[string][]dao.Code)
+func Code(types []string) (*map[string][]dal.Code, error) {
+	var newCodes map[string][]dal.Code
+	newCodes = make(map[string][]dal.Code)
 
 	codes, err := codemodel.GetByTypes(types)
 	if err != nil {
@@ -22,14 +22,14 @@ func Code(types []string) (*map[string][]dao.Code, error) {
 
 	if codes != nil {
 		var t string
-		codeSlice := []dao.Code{}
+		codeSlice := []dal.Code{}
 		t = c[0].Type
 
 		for _, code := range c {
 			if code.Type != t {
 				newCodes[t] = codeSlice
 				t = code.Type
-				codeSlice = []dao.Code{}
+				codeSlice = []dal.Code{}
 			}
 
 			codeSlice = append(codeSlice, code)

@@ -1,8 +1,8 @@
 package middleware
 
 import (
-	club_err "club/model/error"
-	"club/model/rest"
+	club_err "club/models/error"
+	"club/models/rest"
 	"club/ws/user_ws"
 	"encoding/json"
 	"log"

@@ -1,8 +1,8 @@
 package club_ws
 
 import (
-	"club/dao"
-	appError "club/model/error"
+	"club/dal"
+	appError "club/models/error"
 	"club/ws/user_ws"
 	"log"
 	"net/http"
@@ -103,7 +103,7 @@ func (s *Subscription) writePump() {
 // serveWs handles websocket requests from the peer.
 func ServeWs(c *gin.Context) (*int, error) {
 	var userId int
-	var userModel dao.User
+	var userModel dal.User
 
 	if value, ok := c.GetQuery("userId"); ok {
 		p, err := strconv.Atoi(value)

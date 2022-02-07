@@ -1,9 +1,9 @@
-package dao
+package dal
 
 import (
-	"club/client"
-	"club/model"
-	appError "club/model/error"
+	"club/clients"
+	"club/models"
+	appError "club/models/error"
 	"time"
 
 	"github.com/jinzhu/gorm"
@@ -22,9 +22,9 @@ func (c *Club) TableName() string {
 	return "club_clubs"
 }
 
-func (c *Club) Insert(club *model.Club) error {
+func (c *Club) Insert(club *models.Club) error {
 
-	err := client.DBEngine.Table(c.TableName()).Create(&club).Error
+	err := clients.DBEngine.Table(c.TableName()).Create(&club).Error
 	if err, ok := err.(*pq.Error); ok {
 		if err.Code == "23505" {
 			return appError.AppError{Message: "您已是房主，請離開房間後再次建立。"}
@@ -41,7 +41,7 @@ func (c *Club) Insert(club *model.Club) error {
 func (c *Club) GetList(clubId *int, topic *string, clubName *string, offset *int, limit *int) ([]*Club, error) {
 	var clubs []*Club
 
-	tx := client.DBEngine.Table(c.TableName()).Select("club_clubs.id, club_clubs.club_name, club_clubs.topic, club_clubs.population, club_user.id, club_user.nickname").Joins("LEFT JOIN club_user ON club_clubs.owner = club_user.id")
+	tx := clients.DBEngine.Table(c.TableName()).Select("club_clubs.id, club_clubs.club_name, club_clubs.topic, club_clubs.population, club_user.id, club_user.nickname").Joins("LEFT JOIN club_user ON club_clubs.owner = club_user.id")
 
 	if clubId != nil {
 		tx = tx.Where("club_clubs.id = ?", *clubId)
@@ -67,7 +67,7 @@ func (c *Club) GetList(clubId *int, topic *string, clubName *string, offset *int
 func (c *Club) FIndExpired(time *time.Time) (*[]Club, error) {
 	var clubs []Club
 
-	err := client.DBEngine.Table(c.TableName()).Select("club_clubs.id").Joins("LEFT JOIN club_user ON club_clubs.owner = club_user.id").Where("club_user.disconnection_time <= ?", *time).Find(&clubs).Error
+	err := clients.DBEngine.Table(c.TableName()).Select("club_clubs.id").Joins("LEFT JOIN club_user ON club_clubs.owner = club_user.id").Where("club_user.disconnection_time <= ?", *time).Find(&clubs).Error
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
 			return nil, nil
@@ -81,7 +81,7 @@ func (c *Club) FIndExpired(time *time.Time) (*[]Club, error) {
 func (c *Club) FindByOwner(owner *int) (*Club, error) {
 	var club Club
 
-	err := client.DBEngine.Table(c.TableName()).Where("owner = ?", *owner).Find(&club).Error
+	err := clients.DBEngine.Table(c.TableName()).Where("owner = ?", *owner).Find(&club).Error
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
 			return nil, nil
@@ -95,7 +95,7 @@ func (c *Club) FindByOwner(owner *int) (*Club, error) {
 func (c *Club) CheckClubExist(id *int) (bool, error) {
 	var count int
 
-	if err := client.DBEngine.Table(c.TableName()).Where("id = ?", *id).Count(&count).Error; err != nil {
+	if err := clients.DBEngine.Table(c.TableName()).Where("id = ?", *id).Count(&count).Error; err != nil {
 		if err != nil {
 			return false, err
 		}
@@ -110,7 +110,7 @@ func (c *Club) CheckClubExist(id *int) (bool, error) {
 
 func (c *Club) DeleteClubById(id *int) error {
 
-	if err := client.DBEngine.Table(c.TableName()).Delete(&Club{}, *id).Error; err != nil {
+	if err := clients.DBEngine.Table(c.TableName()).Delete(&Club{}, *id).Error; err != nil {
 		if err != nil {
 			return err
 		}
@@ -121,7 +121,7 @@ func (c *Club) DeleteClubById(id *int) error {
 
 func (c *Club) UpdatePopulation(id *int, population *int) error {
 
-	if err := client.DBEngine.Table(c.TableName()).Where("id = ?", *id).Update("population", population).Error; err != nil {
+	if err := clients.DBEngine.Table(c.TableName()).Where("id = ?", *id).Update("population", population).Error; err != nil {
 		return err
 	}
 

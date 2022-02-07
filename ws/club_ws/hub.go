@@ -1,8 +1,8 @@
 package club_ws
 
 import (
-	"club/dao"
-	"club/model"
+	"club/dal"
+	model "club/models"
 	"club/ws/user_ws"
 	"encoding/json"
 	"log"
@@ -46,7 +46,7 @@ var H = hub{
 }
 
 func (h *hub) Run() {
-	var clubModel dao.Club
+	var clubModel dal.Club
 
 	for {
 		select {

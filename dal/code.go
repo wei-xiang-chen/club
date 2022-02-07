@@ -1,7 +1,7 @@
-package dao
+package dal
 
 import (
-	"club/client"
+	"club/clients"
 
 	"github.com/jinzhu/gorm"
 )
@@ -21,7 +21,7 @@ func (c *Code) TableName() string {
 func (c *Code) GetByTypes(types []string) (*[]Code, error) {
 	var codes []Code
 
-	tx := client.DBEngine.Table(c.TableName()).Select("club_code.type, club_code.option")
+	tx := clients.DBEngine.Table(c.TableName()).Select("club_code.type, club_code.option")
 	if len(types) != 0 {
 		tx = tx.Where("type IN (?)", types)
 	}
@@ -40,7 +40,7 @@ func (c *Code) GetByTypes(types []string) (*[]Code, error) {
 func (c *Code) CheckCode(_type string, option string) (*int, error) {
 	var count int
 
-	err := client.DBEngine.Table(c.TableName()).Where("type = ? AND option = ?", _type, option).Count(&count).Error
+	err := clients.DBEngine.Table(c.TableName()).Where("type = ? AND option = ?", _type, option).Count(&count).Error
 	if err != nil {
 		return nil, err
 	}

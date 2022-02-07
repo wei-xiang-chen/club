@@ -1,8 +1,8 @@
 package code
 
 import (
-	"club/model/rest"
-	"club/service/code_service"
+	"club/models/rest"
+	"club/services/code_service"
 	"net/http"
 
 	"github.com/gin-gonic/gin"

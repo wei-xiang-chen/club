@@ -1,11 +1,11 @@
 package club
 
 import (
-	"club/model"
-	appError "club/model/error"
-	"club/model/rest"
-	"club/service/club_service"
-	"club/service/code_service"
+	"club/models"
+	appError "club/models/error"
+	"club/models/rest"
+	"club/services/club_service"
+	"club/services/code_service"
 	"club/util"
 	"net/http"
 	"strconv"
@@ -47,7 +47,7 @@ func GetList(c *gin.Context) error {
 }
 
 func Create(c *gin.Context) error {
-	var club model.Club
+	var club models.Club
 	var restResult rest.RestResult
 
 	c.ShouldBindJSON(&club)
